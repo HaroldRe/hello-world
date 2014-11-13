@@ -1,0 +1,49 @@
+MySQL 5.6.20 Replication
+
+###syntax
+
+`CHANGE MASTER TO option [, option, ...];`
+
+###option
+
+    MASTER_HOST = 'host_name'
+    MASTER_USER = 'user_name'
+    MASTER_PASSWORD = 'password'
+    MASTER_PORT = port_num
+    MASTER_CONNECT_RETRY = interval
+    MASTER_LOG_FILE = 'master_log_name'
+    MASTER_LOG_POS = master_log_pos
+    RELAY_LOG_FILE = 'relay_log_name'
+    RELAY_LOG_POS = relay_log_pos
+    MASTER_SSL = {0|1}
+    MASTER_SSL_CA = 'ca_file_name'
+    MASTER_SSL_CAPATH = 'ca_directory_name'
+    MASTER_SSL_CERT = 'cert_file_name'
+    MASTER_SSL_KEY = 'key_file_name'
+    MASTER_SSL_CIPHER = 'cipher_list'
+
+MASTER_LOG_FILE과 MASTER_LOG_POS까지 입력하면 Replication을 구성할 시점(position)까지 지정할 수 있다.
+
+`start slave;`
+
+###my.ini
+
+    replicate_wild_do_table =
+    server-id =
+
+master DB의 host, user, password, port만 지정해도 기본적인 Replication은 구성되지만, DB의 구성파일인 my.ini에 replicate_wild_do_table에 DB나 table명을 잘 못 입력하거나 master 혹은 다른 slave DB와 동일한 server-id 값을 사용하면 Replication 오류가 발생한다.
+
+`mysql> show slave status\G`  
+![](https://dl.dropboxusercontent.com/u/384987/%40links%20for%20Markdown%20formatted/ShowSlaveStatus.png)
+
+###status
+    Slave_IO_Running
+    Slave_SQL_Running
+    Seconds_Behind_Master
+
+Replication 구성이 변경되지 않은 상태라면, Slave_IO_Running과 Slave_SQL_Running이 Yes이고 Seconds_Behind_Master 값이 0이면 Master와 Slave간 동기화는 정상이라고 볼 수 있다.
+
+Replication이 구성되면 data 디렉터리에 master.info 파일이 생성되는데 이 파일에 Master_Log_File, Read_Master_Log_Pos, Master_Host, Master_User, Master_Password, Master_Port 등의 값을 저장하고 있다.
+
+master.info에 있는 값들은 명령어 라인 또는 my.ini에서 지정하는 서버 옵션들보다 우선권을 가지고 있다. 따라서 DB 이전 등의 이유로 Replication을 재구성한 경우에는
+Replicate_Wild_Do_Table에 지정한 DB(Master)에서 생성한 table이 Slave에서 확인되어야 정상이라고 판단할 수 있다.
