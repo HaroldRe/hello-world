@@ -1,6 +1,6 @@
 MySQL 5.6.20 Replication
 
-###syntex
+###syntexx
 
 `CHANGE MASTER TO option [, option, ...];`
 
